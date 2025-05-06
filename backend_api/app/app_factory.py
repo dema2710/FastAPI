@@ -9,3 +9,5 @@ def get_application() -> FastAPI:
 
     return app
 
+
+

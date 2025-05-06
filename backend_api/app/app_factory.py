@@ -8,3 +8,4 @@ def get_application() -> FastAPI:
     app.include_router(router_users, prefix="/users", tags=["Users"])
 
     return app
+

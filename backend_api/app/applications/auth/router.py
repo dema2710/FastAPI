@@ -16,4 +16,4 @@ async def user_login(
     session: AsyncSession = Depends(get_async_session),
 ):
     token_pair = await auth_handler.get_login_token_pairs(data, session)
-    return
+    return token_pair

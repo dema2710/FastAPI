@@ -1,6 +1,13 @@
+from datetime import datetime
+
+import jwt
+from asyncpg.pgproto.pgproto import timedelta
+from click import pass_obj
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException, status
 
+from applications.auth.password_handler import PasswordEncrypt
 from applications.users.crud import get_user_by_email
 from settings import settings
 
@@ -13,11 +20,27 @@ class AuthHandler:
     async def get_login_token_pairs(self, data: OAuth2PasswordRequestForm, session: AsyncSession):
         user_email = data.username
         user_password = data.password
-        user = await get_user_by_email()
+        user = await get_user_by_email(user_email, session)
 
-        print(user, 999999)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User not found"
+            )
 
+        is_valid_password = await PasswordEncrypt.verify_password(user_password, user.hashed_password)
+        if not is_valid_password:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Incorrect password"
+            )
 
+    async def create_token(self, payload: dict, expiry: timedelta) -> str:
+        now = datetime.now()
+        time_payload = {"exp": now + expiry, "iat": now}
+        token = jwt.encode(payload | time_payload, self.secret, self.algorithm)
+        print(token)
+        return token
 
 
 auth_handler = AuthHandler()

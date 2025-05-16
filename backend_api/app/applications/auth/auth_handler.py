@@ -2,7 +2,6 @@ from datetime import datetime
 
 import jwt
 from asyncpg.pgproto.pgproto import timedelta
-from click import pass_obj
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status

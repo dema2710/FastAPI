@@ -7,7 +7,7 @@ from applications.auth.auth_handler import auth_handler
 from applications.auth.security import get_current_user
 from applications.users.models import User
 from applications.users.schemas import BaseUserInfo
-from database.session_dependencies import get_async_session
+from database.sessions_dependencies import get_async_session
 
 
 router_auth = APIRouter()

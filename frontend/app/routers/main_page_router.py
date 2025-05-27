@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
+
 
 @router.get('/')
 async def index(request: Request):
@@ -13,7 +14,11 @@ async def index(request: Request):
 
 
 @router.get('/login')
-async def login(request: Request):
+@router.post('/login')
+async def login(request: Request, user_email: str = Form(''), password: str = Form('')):
+    print(request.method, 333333)
+    print(f"{user_email}")
+    print(f"{password}")
     context = {"request": request}
     response = templates.TemplateResponse("index.html", context=context)
     return response

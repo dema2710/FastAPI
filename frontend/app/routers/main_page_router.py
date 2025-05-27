@@ -1,3 +1,4 @@
+import httpx
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 
@@ -12,6 +13,13 @@ async def index(request: Request):
     response = templates.TemplateResponse("index.html", context=context)
     return response
 
+async def login_user(user_email: str, password: str):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            url='http://backend_api:9999/api/auth/login',
+            data={"username": user_email, "password": password}
+        )
+        print(response.json())
 
 @router.get('/login')
 @router.post('/login')
@@ -19,6 +27,10 @@ async def login(request: Request, user_email: str = Form(''), password: str = Fo
     print(request.method, 333333)
     print(f"{user_email}")
     print(f"{password}")
+
+    await login_user(user_email, password)
+
+
     context = {"request": request}
     response = templates.TemplateResponse("index.html", context=context)
     return response

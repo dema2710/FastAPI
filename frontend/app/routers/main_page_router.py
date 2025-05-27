@@ -9,4 +9,4 @@ templates = Jinja2Templates(directory="templates")
 async def index(request: Request):
     context = {"request": request}
     response = templates.TemplateResponse("index.html", context=context)
-    return "a"
+    return response

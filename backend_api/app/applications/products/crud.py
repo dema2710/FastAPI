@@ -4,13 +4,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import asc, desc, select, func, or_, and_
 import math
 
-from applications.products.models import Product, Cart
+from applications.products.models import Product, Cart, CartProduct
 from applications.products.schemas import SearchParamsSchema, SortEnum, SortByEnum
 
 
 async def create_product_in_db(product_uuid, title, description, price, main_image, images, session) -> Product:
     """
         uuid_data: Mapped[uuid.UUID] = mapped_column(default=uuid.uuid4)
+
     title: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
     description: Mapped[str] = mapped_column(String(1000), index=True, default="")
     price: Mapped[float] = mapped_column(nullable=False)
@@ -71,8 +72,8 @@ async def get_products_data(params: SearchParamsSchema, session: AsyncSession):
 
 async def get_product_by_pk(pk: int, session: AsyncSession) -> Product | None:
     query = select(Product).filter(Product.id == pk)
-    result = await session.execute(query)
     # query = select(Product).filter_by(id = pk)
+    result = await session.execute(query)
     return result.scalar_one_or_none()
 
 
@@ -88,3 +89,17 @@ async def get_or_create_cart(user_id: int, session: AsyncSession) -> Cart:
     session.add(cart)
     await session.commit()
     return cart
+
+
+async def get_or_create_cart_product(product_id: int, cart_id: int, session: AsyncSession) -> CartProduct:
+    query = select(CartProduct).filter_by(cart_id=cart_id, product_id=product_id)
+    result = await session.execute(query)
+    cart_product = result.scalar_one_or_none()
+
+    if cart_product:
+        return cart_product
+
+    cart_product = CartProduct(cart_id=cart_id, product_id=product_id)
+    session.add(cart_product)
+    await session.commit()
+    return cart_product
